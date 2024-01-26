@@ -1,0 +1,6 @@
+---
+dependencies:
+  - name: common
+    src: ../../common
+
+

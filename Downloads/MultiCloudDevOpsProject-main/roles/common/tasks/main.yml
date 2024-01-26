@@ -1,0 +1,5 @@
+---
+- name: Common tasks
+  debug:
+    msg: "This is a common task."
+

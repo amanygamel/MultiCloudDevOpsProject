@@ -1,0 +1,5 @@
+---
+- name: Install SonarQube
+  debug:
+    msg: "This is a placeholder task for SonarQube installation."
+
