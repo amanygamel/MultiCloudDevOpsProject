@@ -1,0 +1,10 @@
+---
+- name: Install required packages
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - git
+    - docker
+    - "openjdk-11-jdk"  # Adjust this line based on your system's package name for Java
+

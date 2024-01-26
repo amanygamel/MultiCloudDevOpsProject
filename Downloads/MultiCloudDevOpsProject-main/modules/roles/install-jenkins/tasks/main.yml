@@ -1,0 +1,5 @@
+---
+- name: Install Jenkins
+  debug:
+    msg: "This is a placeholder task for Jenkins installation."
+
