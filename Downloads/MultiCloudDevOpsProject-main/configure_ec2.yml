@@ -1,0 +1,10 @@
+---
+- name: Configure EC2 Instance
+  hosts: worker
+  become: true
+
+  roles:
+    - install-packages
+    - install-jenkins
+    - install-sonarqube
+
