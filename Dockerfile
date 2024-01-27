@@ -1,20 +1,20 @@
-# Use an official Node.js runtime as a base image
+# Use an official Node.js runtime as a parent image
 FROM node:14
 
-# Set the working directory in the container
+# Set the working directory to /app
 WORKDIR /app
 
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
 
-# Install Node.js dependencies
+# Install app dependencies
 RUN npm install
 
-# Copy the application code to the working directory
+# Bundle app source
 COPY . .
 
-# Your other Dockerfile instructions
-# ...
+# Expose the port on which your app is running (if applicable)
+# EXPOSE 8080
 
-# Specify the command to run on container startup
-CMD ["npm", "start"]
+# Define the command to run your app
+# CMD ["npm", "start"]
