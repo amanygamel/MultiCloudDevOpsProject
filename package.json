@@ -1,0 +1,26 @@
+{
+  "name": "amany",
+  "version": "1.0.0",
+  "description": "The OpenShift client `oc` simplifies working with Kubernetes and OpenShift clusters, offering a number of advantages over `kubectl` such as easy login, kube config file management, and access to developer tools. The `kubectl` binary is included alongside for when strict Kubernetes compliance is necessary.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "build": "echo 'Bulid running script' "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amanygamel/MultiCloudDevOpsProject.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/amanygamel/MultiCloudDevOpsProject/issues"
+  },
+  "homepage": "https://github.com/amanygamel/MultiCloudDevOpsProject#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "mocha": "^10.2.0"
+  }
+}
