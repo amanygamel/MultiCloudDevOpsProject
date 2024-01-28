@@ -14,6 +14,11 @@ COPY gradle gradle
 # Give execute permission to the Gradle Wrapper
 RUN chmod +x gradlew
 
+# Set the Gradle version
+ENV GRADLE_VERSION=7.3.3
+# Use the specified Gradle version
+RUN gradle wrapper --gradle-version=$GRADLE_VERSION
+
 # Run Gradle task explicitly specifying a non-root user
 RUN ./gradlew dependencies --no-daemon
 
