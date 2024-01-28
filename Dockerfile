@@ -10,13 +10,18 @@ COPY build.gradle settings.gradle ./
 # Download and resolve dependencies using the Gradle Wrapper
 COPY gradlew .
 COPY gradle gradle
-RUN ./gradlew dependencies
+
+# Give execute permission to the Gradle Wrapper
+RUN chmod +x gradlew
+
+# Run Gradle task explicitly specifying a non-root user
+RUN ./gradlew dependencies --no-daemon
 
 # Copy the rest of the source code
 COPY . .
 
 # Build the application using the Gradle Wrapper
-RUN ./gradlew build --stacktrace
+RUN ./gradlew build --stacktrace --no-daemon
 
 # Use a minimal base image for the runtime
 FROM adoptopenjdk:11-jre-hotspot
