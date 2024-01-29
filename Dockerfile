@@ -1,5 +1,5 @@
 # Use a minimal base image for building
-FROM gradle:7.3.3-jdk11 AS build
+FROM openjdk:11-jdk-slim AS build
 
 # Set the working directory
 WORKDIR /app
