@@ -20,6 +20,8 @@ RUN ./gradlew dependencies
 # Copy the rest of the source code
 COPY . .
 
+# Change to the 'gradle' user before running the build command
+USER gradle
 # Build the application using the Gradle Wrapper
 RUN ./gradlew build --stacktrace
 
