@@ -20,15 +20,8 @@ RUN ./gradlew dependencies
 # Copy the rest of the source code
 COPY . .
 
-# Create the gradle user
-RUN adduser --disabled-password --gecos '' gradle
-
-# Give execute permission to the Gradle Wrapper for the gradle user
-RUN chown gradle:gradle ./gradlew && chmod +x ./gradlew
-
-# Use gosu to run the build as the gradle user
-RUN apt-get update && apt-get install -y gosu \
-    && gosu gradle ./gradlew build --stacktrace || true
+# Run the Gradle build explicitly setting the output directory
+RUN ./gradlew build --stacktrace --no-daemon -PoutputDir=/app/build/libs
 
 # Use a minimal base image for the runtime
 FROM adoptopenjdk:11-jre-hotspot
