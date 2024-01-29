@@ -20,10 +20,9 @@ RUN ./gradlew dependencies
 # Copy the rest of the source code
 COPY . .
 
-# Change to the 'gradle' user before running the build command
-USER gradle
-# Build the application using the Gradle Wrapper
-RUN ./gradlew build --stacktrace
+# Use gosu to run the build as a non-root user
+RUN apt-get update && apt-get install -y gosu \
+    && gosu gradle ./gradlew build --stacktrace
 
 # Use a minimal base image for the runtime
 FROM adoptopenjdk:11-jre-hotspot
