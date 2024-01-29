@@ -25,6 +25,7 @@ RUN apt-get update && apt-get install -y gosu \
     && gosu gradle ./gradlew build --stacktrace || true
 
 # Use a minimal base image for the runtime
+# Use a minimal base image for the runtime
 FROM adoptopenjdk:11-jre-hotspot
 
 # Set the working directory
