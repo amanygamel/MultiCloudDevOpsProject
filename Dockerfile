@@ -23,6 +23,9 @@ COPY . .
 # Create the gradle user
 RUN adduser --disabled-password --gecos '' gradle
 
+# Give execute permission to the Gradle Wrapper for the gradle user
+RUN chown gradle:gradle ./gradlew && chmod +x ./gradlew
+
 # Use gosu to run the build as the gradle user
 RUN apt-get update && apt-get install -y gosu \
     && gosu gradle ./gradlew build --stacktrace || true
