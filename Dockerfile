@@ -20,11 +20,13 @@ RUN ./gradlew dependencies
 # Copy the rest of the source code
 COPY . .
 
-# Use gosu to run the build as a non-root user
+# Create the gradle user
+RUN adduser --disabled-password --gecos '' gradle
+
+# Use gosu to run the build as the gradle user
 RUN apt-get update && apt-get install -y gosu \
     && gosu gradle ./gradlew build --stacktrace || true
 
-# Use a minimal base image for the runtime
 # Use a minimal base image for the runtime
 FROM adoptopenjdk:11-jre-hotspot
 
