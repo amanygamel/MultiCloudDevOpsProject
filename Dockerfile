@@ -20,6 +20,9 @@ RUN ./gradlew dependencies
 # Copy the rest of the source code
 COPY . .
 
+# Give execute permission to the Gradle Wrapper for the gradle user
+RUN chmod +x ./gradlew
+
 # Run the Gradle build explicitly setting the output directory
 RUN ./gradlew build --stacktrace --no-daemon -PoutputDir=/app/build/libs
 
