@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.6.3'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'org.sonarqube' version '3.3' // Add the SonarQube plugin
 }
 
 group = 'com.example'
@@ -20,4 +21,19 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+// Configure the SonarQube plugin
+sonarqube {
+    properties {
+        property 'sonar.host.url', 'http://127.0.0.1:9000/' // Replace with your SonarQube server URL
+        // Add other SonarQube properties if needed
+    }
+}
+
+// Optional: Configure the location of the SonarQube scanner executable
+sonarqube {
+    properties {
+        property 'sonar.scanner.executable', '/opt/sonar-scanner-5.0.1.3006-linux' // Replace with the path to your SonarQube scanner executable
+    }
 }
