@@ -2,55 +2,98 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = 'docker.io/mohamedemam2020'
-        DOCKER_IMAGE = 'spring-boot-app'
-        OPENSHIFT_PROJECT = 'nti'
+        DOCKER_HUB_CREDENTIALS = '41a6a651-2ada-405d-866c-f9817d4f1cc7'
+        DOCKER_IMAGE_NAME = 'new_image'
+        MAIN_BRANCH = 'main'
+        DOCKER_REGISTRY = 'monjj'
+        OPENSHIFT_PROJECT = 'amany'
         OPENSHIFT_SERVER = 'https://api.ocpuat.devopsconsulting.org:6443'
-        APP_SERVICE_NAME = 'spring-boot-app'
+        APP_SERVICE_NAME = 'task9_openshift-app'
         APP_PORT = '8080'
-        APP_HOST_NAME = 'spring-boot-app.apps.ocpuat.devopsconsulting.org'
+        APP_HOST_NAME = 'task9-openshift-app.apps.ocpuat.devopsconsulting.org'
+        SONARQUBE_URL = 'http://127.0.0.1:9000/' // Replace with your SonarQube URL
+        imageTagApp = "build-${BUILD_NUMBER}-app"
     }
 
     stages {
         stage('Checkout') {
             steps {
                 script {
-                    git branch: 'main', url: 'https://github.com/EngMohamedElEmam/spring-boot-app'
+                    git branch: 'main', url: 'https://github.com/amanygamel/MultiCloudDevOpsProject'
                 }
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build and Dockerize') {
             steps {
-                script {
-                    docker.build("${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}")
-                }
+                // Build your application (adjust this based on your build tool, e.g., Maven, Gradle)
+
+                // Build a Docker image
+                sh "echo 'Amany*2023' | gpg --passphrase-fd 0 --batch --yes --no-tty --symmetric --cipher-algo AES256 --output /var/lib/jenkins/.docker/config.json.gpg /var/lib/jenkins/.docker/config.json"
+                sh "echo 'Amany*2023' | docker login -u monjj --password-stdin"
+                sh 'chmod +x gradlew'
+                sh 'docker build -t ${DOCKER_REGISTRY}:${imageTagApp} .'
+                sh "docker tag ${DOCKER_REGISTRY}:${imageTagApp} docker.io/${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${imageTagApp}"
             }
         }
 
         stage('Push Docker Image') {
             steps {
+                sh "echo 'Amany*2023' | docker login -u monjj --password-stdin"
+                sh "docker push docker.io/${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${imageTagApp}"
+            }
+        }
+
+        stage('Unit Test') {
+            steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-creds', usernameVariable: 'DOCKER_REGISTRY_USERNAME', passwordVariable: 'DOCKER_REGISTRY_PASSWORD')]) {
-                        sh "echo \${DOCKER_REGISTRY_PASSWORD} | docker login -u \${DOCKER_REGISTRY_USERNAME} --password-stdin"
-                        docker.image("${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}").push()
+                    // Run unit tests (if applicable)
+                    sh 'chmod +x ./gradlew'
+                    sh './gradlew test'
+                }
+            }
+        }
+        stage('SonarQube Test') {
+            steps {
+                script {
+                    withSonarQubeEnv('sonar') {
+                        sh "chmod +x ./gradlew" // Ensure that the build script is executable
+                        sh "./gradlew sonarqube --stacktrace"
                     }
                 }
             }
         }
 
-        stage('Deploy to OpenShift') {
+        stage('Deploy on OpenShift') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'openshift-credentials', variable: 'OPENSHIFT_SECRET')]) {
-                    sh "oc login --token=\${OPENSHIFT_SECRET} \${OPENSHIFT_SERVER} --insecure-skip-tls-verify"
+                    withCredentials([string(credentialsId: 'open-shift', variable: 'OPENSHIFT_SECRET')]) {
+                        sh "oc login --token=\${OPENSHIFT_SECRET} --server=\${OPENSHIFT_SERVER} --insecure-skip-tls-verify"
                     }
                     sh "oc project \${OPENSHIFT_PROJECT}"
-                    sh "oc delete dc,svc,deploy,ingress,route \${DOCKER_IMAGE} || true"
-                    sh "oc new-app \${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}"
-                    sh "oc create route edge --service \${APP_SERVICE_NAME} --port \${APP_PORT} --hostname \${APP_HOST_NAME} --insecure-policy Redirect"
+
+                    // Delete existing deployment and service if they exist
+                    sh "oc delete all -l app=\${APP_SERVICE_NAME} || true"
+
+                    // Create a new deployment
+                    sh "oc new-app ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${imageTagApp} --name=task9-openshift-app"
+
+                    // Expose the service
+                    sh "oc expose svc/task9-openshift-app --port \${APP_PORT} --hostname \${APP_HOST_NAME}"
+
+                    // Patch the route to use edge termination
+                    sh "oc patch route/task9-openshift-app -p '{\"spec\":{\"tls\":{\"termination\":\"edge\"}}}'"
                 }
             }
+        }
+    } 
+    
+    post {
+        success {
+            echo 'Pipeline executed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
         }
     }
 }
