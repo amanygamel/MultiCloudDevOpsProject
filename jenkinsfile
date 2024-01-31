@@ -1,3 +1,8 @@
+@Library('MultiCloudDevOpsProject') _
+import  build
+import  test
+import  sonarqu
+
 pipeline {
     agent any
 
@@ -26,40 +31,25 @@ pipeline {
 
         stage('Build and Dockerize') {
             steps {
-                // Build your application (adjust this based on your build tool, e.g., Maven, Gradle)
-
-                // Build a Docker image
-                sh "echo 'Amany*2023' | gpg --passphrase-fd 0 --batch --yes --no-tty --symmetric --cipher-algo AES256 --output /var/lib/jenkins/.docker/config.json.gpg /var/lib/jenkins/.docker/config.json"
-                sh "echo 'Amany*2023' | docker login -u monjj --password-stdin"
-                sh 'chmod +x gradlew'
-                sh 'docker build -t ${DOCKER_REGISTRY}:${imageTagApp} .'
-                sh "docker tag ${DOCKER_REGISTRY}:${imageTagApp} docker.io/${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${imageTagApp}"
+                script {
+                    build.buildDockerImage(DOCKER_REGISTRY, DOCKER_IMAGE_NAME, imageTagApp)
+                }
             }
         }
-
-        stage('Push Docker Image') {
-            steps {
-                sh "echo 'Amany*2023' | docker login -u monjj --password-stdin"
-                sh "docker push docker.io/${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${imageTagApp}"
-            }
-        }
+        
 
         stage('Unit Test') {
             steps {
                 script {
-                    // Run unit tests (if applicable)
-                    sh 'chmod +x ./gradlew'
-                    sh './gradlew test'
+                    test.runUnitTests()
                 }
             }
         }
+
         stage('SonarQube Test') {
             steps {
                 script {
-                    withSonarQubeEnv('sonar') {
-                        sh "chmod +x ./gradlew" // Ensure that the build script is executable
-                        sh "./gradlew sonarqube --stacktrace"
-                    }
+                    sonarqu.runSonarQubeAnalysis()
                 }
             }
         }
@@ -83,11 +73,12 @@ pipeline {
 
                     // Patch the route to use edge termination
                     sh "oc patch route/task9-openshift-app -p '{\"spec\":{\"tls\":{\"termination\":\"edge\"}}}'"
+                   }
                 }
             }
         }
-    } 
-    
+    }
+
     post {
         success {
             echo 'Pipeline executed successfully!'
