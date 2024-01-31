@@ -10,9 +10,9 @@ pipeline {
         DOCKER_REGISTRY = 'monjj'
         OPENSHIFT_PROJECT = 'amany'
         OPENSHIFT_SERVER = 'https://api.ocpuat.devopsconsulting.org:6443'
-        APP_SERVICE_NAME = 'task9_openshift-app'
+        APP_SERVICE_NAME = 'task19_openshift-app'
         APP_PORT = '8080'
-        APP_HOST_NAME = 'task9-openshift-app.apps.ocpuat.devopsconsulting.org'
+        APP_HOST_NAME = 'task19-openshift-app.apps.ocpuat.devopsconsulting.org'
         SONARQUBE_URL = 'http://127.0.0.1:9000/' // Replace with your SonarQube URL
         imageTagApp = "build-${BUILD_NUMBER}-app"
     }
@@ -63,13 +63,13 @@ pipeline {
                     sh "oc delete all -l app=\${APP_SERVICE_NAME} || true"
 
                     // Create a new deployment
-                    sh "oc new-app ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${imageTagApp} --name=task9-openshift-app"
+                    sh "oc new-app ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${imageTagApp} --name=task19-openshift-app"
 
                     // Expose the service
-                    sh "oc expose svc/task9-openshift-app --port \${APP_PORT} --hostname \${APP_HOST_NAME}"
+                    sh "oc expose svc/task19-openshift-app --port \${APP_PORT} --hostname \${APP_HOST_NAME}"
 
                     // Patch the route to use edge termination
-                    sh "oc patch route/task9-openshift-app -p '{\"spec\":{\"tls\":{\"termination\":\"edge\"}}}'"
+                    sh "oc patch route/task19-openshift-app -p '{\"spec\":{\"tls\":{\"termination\":\"edge\"}}}'"
                    }
                 }
             }
