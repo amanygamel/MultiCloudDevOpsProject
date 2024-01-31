@@ -1,7 +1,7 @@
 @Library('MultiCloudDevOpsProject') _
-import  build
-import  test
-import  sonarqu
+import  /vars/build
+import  /vars/test
+import  /vars/sonarqu
 
 pipeline {
     agent any
